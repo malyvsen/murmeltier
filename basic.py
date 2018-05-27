@@ -1,19 +1,32 @@
 import gym
 import numpy as np
-from layer import *
-from agent import *
+from layers import LeakyReLU
+from agent import Agent
 import time
 import datetime
 
 
-optimal_agent = Agent(config.population_stddev)
+env_name = 'CartPole-v0'
+env = gym.make(env_name)
+hidden_layer_sizes = [8, 6, 4]
+population_size = 64
+population_stddev = 1
+learning_rate = 0.5
+
+
+optimal_agent = Agent(env = env, layer_type = LeakyReLU, hidden_layer_sizes = hidden_layer_sizes, stddev = population_stddev)
 
 
 class Bubble:
-    '''An agent and its environment'''
+    '''An agent, its environment, and miscellaneous information such as the total reward'''
     def __init__(self, agent = None):
-        self.env = gym.make(config.env_name)
-        self.reset(agent = agent)
+        global env_name
+        self.env = gym.make(env_name)
+        self.reset_env()
+        if agent is None:
+            self.randomize_agent()
+        else:
+            self.agent = agent
 
     def get_weight(self):
         return np.exp(self.reward)
@@ -28,33 +41,33 @@ class Bubble:
         self.observation, current_reward, self.done, info = self.env.step(action)
         self.reward += current_reward
 
-    def reset(self, agent = None):
-        global optimal_agent
-        if agent is None:
-            self.agent = optimal_agent + Agent(stddev = config.population_stddev)
-        else:
-            self.agent = agent
+    def reset_env(self):
         self.reward = 0
         self.observation = self.env.reset()
         self.done = False
 
+    def randomize_agent(self):
+        global optimal_agent
+        self.agent = optimal_agent + Agent(env = self.env, layer_type = LeakyReLU, hidden_layer_sizes = hidden_layer_sizes, stddev = population_stddev)
 
-bubbles = [Bubble() for i in range(config.population_size)]
+
+bubbles = [Bubble() for i in range(population_size)]
 
 
 def reset():
     global bubbles
     for bubble in bubbles:
-        bubble.reset()
+        bubble.reset_env()
+        bubble.randomize_agent()
 
 
 def update_optimal_agent():
-    global optimal_agent, bubbles
-    weighted_agent = Agent(stddev = 0)
+    global optimal_agent, bubbles, learning_rate
+    weighted_agent = optimal_agent * 0
     for bubble in bubbles:
         weighted_agent += bubble.weighted_agent()
     weighted_agent /= sum([bubble.get_weight() for bubble in bubbles])
-    optimal_agent += (weighted_agent - optimal_agent) * config.learning_rate
+    optimal_agent += (weighted_agent - optimal_agent) * learning_rate
 
 
 def do_agents_work():
@@ -83,7 +96,7 @@ def demo(target_fps = 30):
     bubble.env.close()
 
 
-def train(num_epochs = config.num_epochs):
+def train(num_epochs = 128):
     start_time = time.time()
     for epoch in range(num_epochs):
         print('epoch ' + str(epoch + 1) + '/' + str(num_epochs))
