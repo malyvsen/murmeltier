@@ -69,7 +69,7 @@ class Layer:
 
 
     def __truediv__(self, scalar):
-        return type(self)(params = {key: self.params[key] / scalar for key in self.params})
+        return self * (1.0 / scalar)
 
 
 

@@ -107,7 +107,3 @@ def train(num_epochs = 128):
         print('ETA ' + str(datetime.timedelta(seconds = eta)))
         update_optimal_agent()
         reset()
-
-
-train()
-demo()

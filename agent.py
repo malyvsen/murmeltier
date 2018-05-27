@@ -79,7 +79,4 @@ class Agent:
 
 
     def __truediv__(self, scalar):
-        result_layers = []
-        for i in range(len(self.layers)):
-            result_layers.append(self.layers[i] * scalar)
-        return type(self)(observation_space = self.observation_space, action_space = self.action_space, layers = result_layers)
+        return self * (1.0 / scalar)
