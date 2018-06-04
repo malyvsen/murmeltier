@@ -2,7 +2,7 @@ import numpy as np
 from gym.spaces import *
 
 
-def space_size(space):
+def size(space):
     '''
     The number of real values needed to represent a space
     One-hot representation is chosen for discrete spaces
@@ -23,9 +23,9 @@ def space_size(space):
     raise NotImplementedError('Unknown space')
 
 
-def observation_to_array(observation, space):
+def to_array(observation, space):
     '''
-    Observation represented as an 1-D np.array of np.float32
+    Observation in given space represented as a 1-D np.array of np.float64
     One-hot representation is chosen for discrete spaces
     Sign representation is chosen for binary spaces
     '''
@@ -44,7 +44,7 @@ def observation_to_array(observation, space):
     raise NotImplementedError('Unknown space')
 
 
-def array_to_action(array, space):
+def from_array(array, space):
     '''
     np.array of output neuron activations converted to action in given space
     One-hot representation is chosen for discrete spaces
