@@ -1,3 +1,4 @@
+import numpy as np
 from ..unit import Unit
 
 
@@ -14,4 +15,4 @@ class ReLU(Unit):
 
 
     def get_output(self, input):
-        return np.max(0, input)
+        return np.maximum(0, input)

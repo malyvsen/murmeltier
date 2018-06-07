@@ -1,3 +1,4 @@
+import numpy as np
 from ..unit import Unit
 
 
@@ -16,4 +17,4 @@ class LeakyReLU(Unit):
 
 
     def get_output(self, input):
-        return np.max(input, input * self.params['alpha'])
+        return np.maximum(input, input * self.params['alpha'])
