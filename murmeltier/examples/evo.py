@@ -1,9 +1,9 @@
 import gym
-from ..units.agents import Feedfoward
-from ..units.composite import layer
-from ..units.activations import LeakyReLU, SoftExp
-from ..learning import Evo
-from ..utils import demo
+from murmeltier.units.agents import Feedfoward
+from murmeltier.units.composite import layer
+from murmeltier.units.activations import LeakyReLU, SoftExp
+from murmeltier.learning import Evo
+from murmeltier.utils import demo
 
 
 env_name = 'CartPole-v0'
