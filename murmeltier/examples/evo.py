@@ -1,14 +1,14 @@
 import gym
 from murmeltier.units.agents import Feedfoward
 from murmeltier.units.composite import layer
-from murmeltier.units.activations import LeakyReLU, SoftExp
+from murmeltier.units.activations import LeakyReLU
 from murmeltier.learning import Evo
 from murmeltier.utils import demo
 
 
-env_name = 'CartPole-v0'
+env_name = 'CartPole-v0' # try replacing this with Acrobot-v1
 proto_env = gym.make(env_name)
-hidden_unit_types = [layer(activation_type = SoftExp), layer(activation_type = LeakyReLU), layer(activation_type = LeakyReLU)]
+hidden_unit_types = [layer(activation_type = LeakyReLU), layer(activation_type = LeakyReLU), layer(activation_type = LeakyReLU)]
 hidden_specs = [8, 6]
 
 

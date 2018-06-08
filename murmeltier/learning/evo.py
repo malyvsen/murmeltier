@@ -12,7 +12,7 @@ class Evo:
         self.optimal_agent = agent_randomizer(stddev = 0)
 
 
-    def train(self, num_epochs = 128, population_size = 64, stddev = 1.0, learning_rate = 0.5, weighter = lambda reward: np.log(1 + np.exp(reward))):
+    def train(self, num_epochs = 128, population_size = 64, stddev = 1.0, learning_rate = 0.5, weighter = lambda reward: np.exp(reward)):
         bubbles = [Bubble(env_name = self.env_name) for i in range(population_size)]
         for epoch in range(num_epochs):
             print('Epoch ' + str(epoch + 1) + '/' + str(num_epochs))
