@@ -5,7 +5,7 @@ from ..unit import Unit
 class SoftExp(Unit):
     '''
     Soft exponential activation from https://arxiv.org/abs/1602.01321
-    for alpha < 0: -ln(1 - alpha * (input - alpha)) / alpha
+    for alpha < 0: -ln(1 - alpha * (input + alpha)) / alpha
     for alpha = 0: input
     for alpha > 0: (exp(input * alpha) - 1) / alpha + alpha
     '''
@@ -22,7 +22,7 @@ class SoftExp(Unit):
     def get_output(self, input):
         alpha = self.params['alpha']
         if alpha < -1e-15:
-            return -np.log(1 - alpha * (input - alpha)) / alpha
+            return -np.log(1 - alpha * (input + alpha)) / alpha
         if alpha > 1e-15:
             return (np.exp(input * alpha) - 1) / alpha + alpha
         return input
