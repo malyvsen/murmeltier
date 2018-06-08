@@ -21,6 +21,11 @@ class SoftExp(Unit):
 
     def get_output(self, input):
         alpha = self.params['alpha']
+        if alpha < -1:
+            alpha = -1
+        elif alpha > 1:
+            alpha = 1
+        
         if alpha < -1e-15:
             return -np.log(1 - alpha * (input + alpha)) / alpha
         if alpha > 1e-15:
