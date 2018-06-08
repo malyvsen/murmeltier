@@ -1,14 +1,14 @@
 import gym
 from ..units.agents import Feedfoward
 from ..units.composite import layer
-from ..units.activations import LeakyReLU
+from ..units.activations import LeakyReLU, SoftExp
 from ..learning import Evo
 from ..utils import demo
 
 
 env_name = 'CartPole-v0'
 proto_env = gym.make(env_name)
-hidden_unit_types = [layer(activation_type = LeakyReLU), layer(activation_type = LeakyReLU), layer(activation_type = LeakyReLU)]
+hidden_unit_types = [layer(activation_type = SoftExp), layer(activation_type = LeakyReLU), layer(activation_type = LeakyReLU)]
 hidden_specs = [8, 6]
 
 
