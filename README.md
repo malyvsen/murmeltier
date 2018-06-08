@@ -2,7 +2,8 @@
 German for marmot. Also, a Python framework for AI experiments. Flexible, not necessarily fast - researching differences of kind rather than differences of scale.
 
 ## Installation
-`pip install murmeltier`
+`pip install murmeltier`  
+*...soon enough.*
 
 ## Dependencies
 Python 3.6.5  
