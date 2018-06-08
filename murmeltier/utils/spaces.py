@@ -51,7 +51,8 @@ def from_array(array, space):
     Sign representation is chosen for binary spaces
     '''
     if isinstance(space, Box):
-        return tuple(action)
+        result = np.maximum(space.low, np.minimum(space.high, array))
+        return tuple(result)
     if isinstance(space, Discrete):
         return np.argmax(array)
     if isinstance(space, MultiDiscrete):
