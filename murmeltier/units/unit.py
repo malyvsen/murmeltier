@@ -6,17 +6,23 @@ class Unit:
     Base class for all units
     Only intended to be used as base class
     To inherit, override __init__ and get_output, see any other unit for example
+    Derived classes must have attributes:
+    * in_specs - the input specification of the unit, usually just the dimensionality
+    * out_specs - same for output
+    * params - a dictionary of {parameter_name: parameter_value}
     '''
-    def __init__(self, params = None, in_space = None, out_space = None):
+    def __init__(self, params = None, in_specs = None, out_specs = None):
         '''
-        Obligatory arguments in all derived classes:
-        params (in dict form {name: param})
-        in_specs, out_specs - specifications for input and output, usually just their dimensionality
+        Obligatory arguments in derived classes as shown here
+        See Unit documentation for their meaning
         '''
         raise NotImplementedError('Attempted to initialize base unit type')
 
 
     def get_output(self, input = None):
+        '''
+        Obligatory argument in all derived classes: input
+        '''
         raise NotImplementedError('Attempted to get the output of base unit type')
 
 
