@@ -12,24 +12,34 @@ class Evo:
         self.optimal_agent = agent_randomizer(stddev = 0)
 
 
-    def train(self, num_epochs = 128, population_size = 64, stddev = 1.0, learning_rate = 0.5, weighter = lambda reward: np.exp(reward)):
+    def train(self, num_epochs = 128, population_size = 64, stddev = 1.0, learning_rate = 0.5, weighter = None):
+        if weighter is None:
+            def weighter(rewards):
+                rms = np.sqrt(np.mean(np.square(rewards)))
+                if rms == 0:
+                    return rewards + 1
+                return np.exp(rewards / rms)
+
         bubbles = [Bubble(env_name = self.env_name) for i in range(population_size)]
+
         for epoch in range(num_epochs):
             print('Epoch ' + str(epoch + 1) + '/' + str(num_epochs))
             for bubble in bubbles:
                 bubble.agent = self.random_agent(stddev = stddev)
-            total_reward = 0
-            total_weight = 0
             for bubble in bubbles:
                 bubble.episode()
-                total_reward += bubble.reward
-                total_weight += weighter(reward = bubble.reward)
+
+            rewards = np.array([bubble.reward for bubble in bubbles])
+            weights = weighter(rewards)
+            total_weight = np.sum(weights)
             weighted_agent = self.optimal_agent * 0
-            for bubble in bubbles:
-                weighted_agent += bubble.agent * weighter(reward = bubble.reward) / total_weight
+            for i in range(len(bubbles)):
+                weighted_agent += bubbles[i].agent * weights[i] / total_weight
             self.optimal_agent += (weighted_agent - self.optimal_agent) * learning_rate
-            print('Average reward: ' + str(total_reward / population_size))
+
+            print('Average reward: ' + str(np.mean(rewards)))
             print('')
+
         return self.optimal_agent
 
 
