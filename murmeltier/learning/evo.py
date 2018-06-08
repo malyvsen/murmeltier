@@ -1,5 +1,6 @@
 import numpy as np
 from .bubble import Bubble
+from ..utils import if_print
 
 
 class Evo:
@@ -12,7 +13,7 @@ class Evo:
         self.optimal_agent = agent_randomizer(stddev = 0)
 
 
-    def train(self, num_epochs = 128, population_size = 64, stddev = 1.0, learning_rate = 0.5, weighter = None):
+    def train(self, num_epochs = 128, population_size = 64, stddev = 1.0, learning_rate = 0.5, weighter = None, verbosity = 2):
         if weighter is None:
             def weighter(rewards):
                 rms = np.sqrt(np.mean(np.square(rewards)))
@@ -23,7 +24,7 @@ class Evo:
         bubbles = [Bubble(env_name = self.env_name) for i in range(population_size)]
 
         for epoch in range(num_epochs):
-            print('Epoch ' + str(epoch + 1) + '/' + str(num_epochs))
+            if_print(verbosity >= 1, 'Epoch ' + str(epoch + 1) + '/' + str(num_epochs))
             for bubble in bubbles:
                 bubble.agent = self.random_agent(stddev = stddev)
             for bubble in bubbles:
@@ -37,8 +38,9 @@ class Evo:
                 weighted_agent += bubbles[i].agent * weights[i] / total_weight
             self.optimal_agent += (weighted_agent - self.optimal_agent) * learning_rate
 
-            print('Average reward: ' + str(np.mean(rewards)))
-            print('')
+            mean_reward = np.mean(rewards)
+            if_print(verbosity >= 2, 'Mean reward: ' + str(mean_reward))
+            if_print(verbosity >= 1, '')
 
         return self.optimal_agent
 
