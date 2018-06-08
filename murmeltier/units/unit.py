@@ -58,8 +58,6 @@ class Unit:
 
 
     def __add__(self, other):
-        if type(self) != type(other):
-            raise TypeError('Cannot add units of different types')
         result = deepcopy(self)
         result.add_equals(other)
         return result
@@ -70,6 +68,10 @@ class Unit:
         Used internally to perform the += operation
         This behavior may be subject to change
         '''
+        if not isinstance(other, Unit):
+            raise TypeError('Cannot add non-unit to unit')
+        if type(self) != type(other):
+            raise TypeError('Cannot add units of different types')
         if self.params.keys() != other.params.keys():
             raise ValueError('Cannot add units of different architectures')
         for key in self.params:
