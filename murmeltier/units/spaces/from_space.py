@@ -13,4 +13,4 @@ class FromSpace(Unit):
 
 
     def get_output(self, input):
-        return space.to_array(input, space = self.space)
+        return spaces.to_array(input, space = self.in_specs)

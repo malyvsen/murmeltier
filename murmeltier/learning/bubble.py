@@ -23,12 +23,17 @@ class Bubble:
     def step(self):
         if self.done:
             return
-        action = self.agent.get_action(self.observation)
+        action = self.agent.get_output(self.observation)
         self.observation, current_reward, self.done, info = self.env.step(action)
         self.reward += current_reward
+        return self.observation, current_reward, self.done, info
 
 
     def reset(self):
         self.reward = 0
         self.observation = self.env.reset()
         self.done = False
+
+
+    def __del__(self):
+        self.env.close()

@@ -1,2 +1,5 @@
-from biases import Biases
-from weights import Weights
+__all__ = ['biases', 'weights']
+
+
+from .biases import Biases
+from .weights import Weights

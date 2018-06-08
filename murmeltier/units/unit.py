@@ -17,7 +17,7 @@ class Unit:
         raise NotImplementedError('Attempted to get the output of base unit type')
 
 
-    def construct(self, param_names, in_specs, out_specs, params = None, param_randomizers = None, stddev = None, stddevs = None):
+    def construct(self, in_specs, out_specs, param_names = None, params = None, param_randomizers = None, stddev = None, stddevs = None):
         '''
         Perform standard operations needed to initialize
         param_names - the param names of the unit, they will be required and checked for
@@ -52,15 +52,6 @@ class Unit:
         self.params = {}
         for key in param_names:
             self.params[key] = param_randomizers[key](stddev = stddevs[key])
-
-
-    def mutate(self, stddev = None, stddevs = None):
-        if sum((stddev is not None, stddevs is not None)) != 1:
-            raise ValueError('Provide exactly one of: stddev, stddevs')
-        if stddev is not None:
-            stddevs = {key: stddev for key in self.params}
-        for key in self.params:
-            self.params[key] += np.random.normal(scale = stddevs[key], size = np.shape(self.params[key]))
 
 
     def __add__(self, other):

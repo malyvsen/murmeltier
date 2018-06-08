@@ -1,8 +1,3 @@
-'''
-murmeltier: a framework for AI experiments
-author: Nicholas Bochenski
-'''
-
-import learning
-import units
-import utils
+__version__ = '0.1.0'
+__author__ = 'Nicholas Bochenski <iceflamecode@gmail.com>'
+__all__ = ['learning, units, utils']

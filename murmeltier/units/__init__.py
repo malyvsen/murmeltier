@@ -7,8 +7,5 @@ Units keep their learned parameters inside, so sharing them is as simple as usin
 Units are vectorized, ie they can be added, subtracted, multiplied etc like vectors whose coordinates are their parameters
 '''
 
-import activations
-import agents
-import lin
-import spaces
-import structural
+
+__all__ = ['activations, agents, lin, spaces, structural']

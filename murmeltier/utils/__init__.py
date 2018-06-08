@@ -1,2 +1,4 @@
-import demo
-import spaces
+__all__ = ['demo', 'spaces']
+
+
+from .demo import demo

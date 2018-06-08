@@ -1,1 +1,4 @@
-from feedforward import Feedfoward
+__all__ = ['feedforward']
+
+
+from .feedforward import Feedfoward

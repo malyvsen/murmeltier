@@ -15,4 +15,4 @@ class ToSpace(Unit):
 
 
     def get_output(self, input):
-        return space.from_array(input, space = self.space)
+        return spaces.from_array(input, space = self.out_specs)

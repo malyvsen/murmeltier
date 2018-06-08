@@ -1,17 +1,18 @@
 import numpy as np
-from bubble import Bubble
+from .bubble import Bubble
 
 
 class Evo:
     '''
     A basic evolutionary algorithm for training agents interacting with OpenAI Gym environments
     '''
-    def __init__(self, env_name, agent_proto):
+    def __init__(self, env_name, agent_randomizer):
         self.env_name = env_name
-        self.optimal_agent = agent_proto
+        self.agent_randomizer = agent_randomizer
+        self.optimal_agent = agent_randomizer(stddev = 0)
 
 
-    def train(num_epochs = 128, population_size = 64, stddev = 1.0, learning_rate = 0.5, weighter = lambda reward: np.exp(reward)):
+    def train(self, num_epochs = 128, population_size = 64, stddev = 1.0, learning_rate = 0.5, weighter = lambda reward: np.log(1 + np.exp(reward))):
         bubbles = [Bubble(env_name = self.env_name) for i in range(population_size)]
         for epoch in range(num_epochs):
             print('Epoch ' + str(epoch + 1) + '/' + str(num_epochs))
@@ -33,6 +34,4 @@ class Evo:
 
 
     def random_agent(self, stddev):
-        delta = self.optimal_agent * 0
-        delta.mutate(stddev = stddev)
-        return self.optimal_agent + delta
+        return self.optimal_agent + self.agent_randomizer(stddev = stddev)

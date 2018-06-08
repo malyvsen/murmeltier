@@ -17,4 +17,4 @@ class Biases(Unit):
 
 
     def get_output(self, input):
-        return input + params['biases']
+        return input + self.params['biases']
