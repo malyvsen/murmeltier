@@ -1,3 +1,6 @@
+from copy import deepcopy
+
+
 class Unit:
     '''
     Base class for all units
@@ -56,18 +59,48 @@ class Unit:
 
     def __add__(self, other):
         if type(self) != type(other):
-            raise TypeError('Cannot add layers of different types')
-        return type(self)(params = {key: self.params[key] + other.params[key] for key in self.params}, in_specs = self.in_specs, out_specs = self.out_specs)
+            raise TypeError('Cannot add units of different types')
+        result = deepcopy(self)
+        result.add_equals(other)
+        return result
+
+
+    def add_equals(self, other):
+        '''
+        Used internally to perform the += operation
+        This behavior may be subject to change
+        '''
+        if self.params.keys() != other.params.keys():
+            raise ValueError('Cannot add units of different architectures')
+        for key in self.params:
+            if isinstance(self.params[key], Unit):
+                self.params[key].add_equals(other.params[key])
+            else:
+                self.params[key] += other.params[key]
 
 
     def __sub__(self, other):
         if type(self) != type(other):
-            raise TypeError('Cannot subtract layers of different types')
+            raise TypeError('Cannot subtract units of different types')
         return self + (other * -1)
 
 
     def __mul__(self, scalar):
-        return type(self)(params = {key: self.params[key] * scalar for key in self.params}, in_specs = self.in_specs, out_specs = self.out_specs)
+        result = deepcopy(self)
+        result.mul_equals(scalar)
+        return result
+
+
+    def mul_equals(self, scalar):
+        '''
+        Used internally to perform the *= operation
+        This behavior may be subject to change
+        '''
+        for key in self.params:
+            if isinstance(self.params[key], Unit):
+                self.params[key].mul_equals(scalar)
+            else:
+                self.params[key] *= scalar
 
 
     def __truediv__(self, scalar):

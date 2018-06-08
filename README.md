@@ -31,7 +31,6 @@ array([ 0.56071995,  6.83696213,  4.36535554, -6.04676206, -1.08439716])
 ```
 
 Units keep their learned parameters inside, so sharing them within the architecture is as simple as using the same unit instance many times.  
-*This actually needs some debugging at the moment.*  
 Units are vectorized - they can be added, subtracted, multiplied etc like vectors whose coordinates are their parameters.  
 ```python
 >>> other_stack = stack * 2
