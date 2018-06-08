@@ -8,4 +8,4 @@ Units are vectorized, ie they can be added, subtracted, multiplied etc like vect
 '''
 
 
-__all__ = ['activations', 'agents', 'lin', 'spaces', 'structural']
+__all__ = ['activations', 'agents', 'lin', 'spaces', 'structural', 'composite']
