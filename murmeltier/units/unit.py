@@ -1,4 +1,5 @@
 from copy import deepcopy
+from murmeltier.utils import assert_disjoint, assert_keys
 
 
 class Unit:
@@ -26,41 +27,52 @@ class Unit:
         raise NotImplementedError('Attempted to get the output of base unit type')
 
 
-    def construct(self, in_specs, out_specs, param_names = None, params = None, param_randomizers = None, stddev = None, stddevs = None):
+    def reset(self, in_specs = None, out_specs = None, param_names = None, params = None, initializers = None, init_param = None, init_params = None):
         '''
-        Perform standard operations needed to initialize
-        param_names - the param names of the unit, they will be required and checked for
-        params - exact parameters to set, these will not be randomized or copied
-        param_randomizers - a dictionary of functions that randomize the parameter whose name is the key
-        These functions should accept one argument: stddev
+        Perform standard operations needed to initialize or reset
+        * param_names - the param names of the unit, they will checked for if provided
+        * params - exact parameters to set, these will not be initialized or copied
+        * initializers - a dictionary of functions that initialize the parameter whose name is the key
         '''
-        self.in_specs = in_specs
-        self.out_specs = out_specs
-
-        if param_names is None or len(param_names) == 0:
-            if params is not None and len(params) != 0:
-                raise ValueError('param_names is empty, but params is not')
+        if params is None:
+            params = {}
+        if not hasattr(self, 'params'):
             self.params = {}
-            return
+        if initializers is None:
+            initializers = {}
+        if not hasattr(self, 'initializers'):
+            self.initializers = {}
+        if init_params is None:
+            init_params = {}
+        if param_names is None:
+            param_names = set(self.params.keys()) | set(params.keys()) | set(self.initializers.keys()) | set(initializers.keys())
 
-        if sum((params is not None, stddev is not None, stddevs is not None)) != 1:
-            raise ValueError('Provide exactly one of: params, stddev, stddevs')
-        if params is not None:
-            if params.keys() != param_names:
-                raise ValueError('params should exactly have keys: ' + str(param_names))
-            self.params = params
-            return
+        if in_specs is not None:
+            self.in_specs = in_specs
+        if not hasattr(self, 'in_specs'):
+            raise ValueError('Provide in_specs when resetting for the first time')
+        if out_specs is not None:
+            self.out_specs = out_specs
+        if not hasattr(self, 'out_specs'):
+            raise ValueError('Provide out_specs when resetting for the first time')
 
-        if param_randomizers is None:
-            raise ValueError('Provide param_randomizers when not providing params')
-        if stddev is not None:
-            stddevs = {key: stddev for key in param_names}
-        if stddevs.keys() != param_names:
-            raise ValueError('stddevs should exactly have keys: ' + str(param_names))
+        self.initializers.update(initializers)
+        assert_keys(keys = param_names, initializers = self.initializers)
 
-        self.params = {}
-        for key in param_names:
-            self.params[key] = param_randomizers[key](stddev = stddevs[key])
+        if init_param is not None:
+            if len(params) > 0:
+                raise ValueError('Do not provide params and init_param simultaneously, as one would override the other')
+            for param_name in param_names:
+                if param_name not in init_params:
+                    init_params[param_name] = init_param
+
+        assert_disjoint(init_params = init_params, params = params)
+
+        for param_name in self.init_params:
+            self.params[param_name] = self.initializers[param_name](param = init_params[param_name])
+
+        self.params.update(params)
+        assert_keys(keys = param_names, params = self.params)
 
 
     def __add__(self, other):
