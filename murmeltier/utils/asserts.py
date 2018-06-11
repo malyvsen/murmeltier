@@ -30,12 +30,12 @@ def assert_keys(keys, **kwargs):
 
 def assert_equal_or_none(**kwargs):
     result = None
-    for arg in kwargs.items():
-        if arg is None:
+    for key in kwargs:
+        if kwargs[key] is None:
             continue
         if result is None:
-            result = arg
+            result = kwargs[key]
             continue
-        if arg is not result:
-            raise AssertionError('Shuld be equal or None: ' + kwargs)
+        if kwargs[key] is not result:
+            raise AssertionError('Should be equal or None: ' + str(kwargs))
     return result
