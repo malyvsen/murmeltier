@@ -38,4 +38,6 @@ def assert_equal_or_none(**kwargs):
             continue
         if kwargs[key] is not result:
             raise AssertionError('Should be equal or None: ' + str(kwargs))
+    if result is None:
+        raise AssertionError('At least one should be provided: ' + str(kwargs))
     return result
