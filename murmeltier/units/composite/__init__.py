@@ -1,4 +1,4 @@
 __all__ = ['layer']
 
 
-from .layer import layer
+from .layer import Layer

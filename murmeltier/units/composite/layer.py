@@ -1,28 +1,20 @@
+from ..unit import Unit
 from ..lin import Weights, Biases
-from ..structural import Stack
+from ..activations import Identity
+from murmeltier.utils import assert_equal_or_none
 
 
-def layer(in_specs = None, out_specs = None, stddev = None, activation_type = None):
+class Layer(Unit):
     '''
     weights -> biases -> activation
-    Returns a layer constructor (which can be treated as a unit type later on)
-    The constructor will only require the parameters not provided to this function
-    activation_type is the only exception - if you do not provide it, no activation will be used
     '''
-    def constructor(in_specs = in_specs, out_specs = out_specs, stddev = stddev):
-        if in_specs is None:
-            raise ValueError('Provide in_specs either before or after currying')
-        if out_specs is None:
-            raise ValueError('Provide out_specs either beofre or after currying')
-        if stddev is None:
-            raise ValueError('Provide stddev either before or after currying')
+    def __init__(in_specs = None, out_specs = None, activation_type = Identity, **kwargs):
+        in_specs = out_specs = assert_equal_or_none(in_specs = in_specs, out_specs = out_specs)
+        config(in_specs = in_specs, out_specs = out_specs)
+        self.params['weights'] = Weights(in_specs = in_specs, out_specs = out_specs, **kwargs)
+        self.params['biases'] = Biases(in_specs = out_specs, out_specs = out_specs, **kwargs)
+        self.params['activation'] = activation_type(in_specs = out_specs, out_specs = out_specs, **kwargs)
 
-        weights = Weights(in_specs = in_specs, out_specs = out_specs, stddev = stddev)
-        biases = Biases(in_specs = out_specs, stddev = stddev)
-        if activation_type is None:
-            return Stack(units = [weights, biases])
 
-        activation = activation_type(in_specs = out_specs, out_specs = out_specs, stddev = stddev)
-        return Stack(units = [weights, biases, activation])
-
-    return constructor
+    def get_output(self, input):
+        return self.params['activation'].get_output(input * self.params['weights'] + self.params['biases'])
