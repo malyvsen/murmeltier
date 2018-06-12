@@ -3,9 +3,9 @@ from ..unit import Unit
 from murmeltier.utils import assert_equal_or_none
 
 
-class ReLU(Unit):
+class Identity(Unit):
     '''
-    Lets positive values pass, replaces negative ones with zeros
+    Lets values pass without modifying them
     '''
     def __init__(self, in_specs = None, out_specs = None, **kwargs):
         in_specs = out_specs = assert_equal_or_none(in_specs = in_specs, out_specs = out_specs)
@@ -13,4 +13,4 @@ class ReLU(Unit):
 
 
     def get_output(self, input):
-        return np.maximum(0, input)
+        return input

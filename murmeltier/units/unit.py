@@ -1,4 +1,6 @@
 from copy import deepcopy
+from murmeltier.utils import trimmed_dict
+import inspect
 
 
 class Unit:
@@ -10,11 +12,14 @@ class Unit:
     * in_specs - the input specification of the unit, usually just the dimensionality
     * out_specs - same for output
     * params - a dictionary of {parameter_name: parameter_value}
+    * initializers - a dictionary of {param_name: initializer_function}, does not need to contain all params
+    It is a good idea to set up these attributes by calling config(...), possibly followed by initialize(...)
     '''
-    def __init__(self, params = None, in_specs = None, out_specs = None):
+    def __init__(self, in_specs = None, out_specs = None, **kwargs):
         '''
         Obligatory arguments in derived classes as shown here
         See Unit documentation for their meaning
+        kwargs are used to pass values to initializers
         '''
         raise NotImplementedError('Attempted to initialize base unit type')
 
@@ -26,41 +31,70 @@ class Unit:
         raise NotImplementedError('Attempted to get the output of base unit type')
 
 
-    def construct(self, in_specs, out_specs, param_names = None, params = None, param_randomizers = None, stddev = None, stddevs = None):
+    def config(self, in_specs = None, out_specs = None, param_names = None, initializers = None):
         '''
-        Perform standard operations needed to initialize
-        param_names - the param names of the unit, they will be required and checked for
-        params - exact parameters to set, these will not be randomized or copied
-        param_randomizers - a dictionary of functions that randomize the parameter whose name is the key
-        These functions should accept one argument: stddev
+        Perform standard operations needed to configure/re-configure
+        * in_specs - overwrite old in_specs if provided
+        * out_specs - overwrite old out_specs if provided
+        * param_names - if provided, params and initializers will be trimmed to this list
+        * initializers - dictionary of initializers, old ones are updated with those if provided
         '''
-        self.in_specs = in_specs
-        self.out_specs = out_specs
-
-        if param_names is None or len(param_names) == 0:
-            if params is not None and len(params) != 0:
-                raise ValueError('param_names is empty, but params is not')
+        if not hasattr(self, 'params'):
             self.params = {}
-            return
+        if initializers is None:
+            initializers = {}
+        if not hasattr(self, 'initializers'):
+            self.initializers = {}
 
-        if sum((params is not None, stddev is not None, stddevs is not None)) != 1:
-            raise ValueError('Provide exactly one of: params, stddev, stddevs')
-        if params is not None:
-            if params.keys() != param_names:
-                raise ValueError('params should exactly have keys: ' + str(param_names))
-            self.params = params
-            return
+        if in_specs is not None:
+            self.in_specs = in_specs
+        if not hasattr(self, 'in_specs'):
+            raise ValueError('Provide in_specs when configuring for the first time')
+        if out_specs is not None:
+            self.out_specs = out_specs
+        if not hasattr(self, 'out_specs'):
+            raise ValueError('Provide out_specs when configuring for the first time')
 
-        if param_randomizers is None:
-            raise ValueError('Provide param_randomizers when not providing params')
-        if stddev is not None:
-            stddevs = {key: stddev for key in param_names}
-        if stddevs.keys() != param_names:
-            raise ValueError('stddevs should exactly have keys: ' + str(param_names))
+        self.initializers.update(initializers)
+        if param_names is not None:
+            self.params = trimmed_dict(dict = self.params, keys = param_names)
+            self.params = trimmed_dict(dict = self.params, keys = param_names)
 
-        self.params = {}
-        for key in param_names:
-            self.params[key] = param_randomizers[key](stddev = stddevs[key])
+
+    def initialize(self, params = None, init_params = None, **kwargs):
+        '''
+        Perform standard operations needed to initialize/reset
+        Valid input:
+        * initialize(stddev = 1.0, loc = 0.0) # where possible, initializers are called like: params[param_name] = initializers[param_name](stddev = 1.0, loc = 0.0)
+        * initialize(params = {'alpha': 0.5}, stddev = 1.0) # sets params['alpha'] to 0.5, everything else is initialized with stddev = 1.0
+        * initialize(init_params = {'beta': {'stddev': 0.5}}, stddev = 1.0) # everything is initialized, beta initializer given distinct arguments
+        * initialize(params = {'gamma': 0.5}, init_params = {'delta': {'stddev': 0.5}}, stddev = 1.0) # combination of the above
+        '''
+        if params is None:
+            params = {}
+        if init_params is None:
+            init_params = {}
+        self.params.update(params)
+        for param_name in init_params:
+            if param_name in params:
+                continue
+            if param_name in self.initializers:
+                self.params[param_name] = self.initializers[param_name](**init_params[param_name])
+            else:
+                if isinstance(self.params[param_name], Unit):
+                    self.params[param_name].initialize(**init_params[param_name])
+                else:
+                    raise ValueError('init_params contains key for non-Unit param which does not have initializer - the key is ' + str(param_name))
+        for param_name in self.initializers:
+            if param_name in params or param_name in init_params:
+                continue
+            self.params[param_name] = self.initializers[param_name](**kwargs)
+        for param_name in self.params:
+            if param_name in params or param_name in init_params or param_name in self.initializers:
+                continue
+            if not isinstance(self.params[param_name], Unit):
+                continue
+            self.params[param_name].initialize(**kwargs)
 
 
     def __add__(self, other):
