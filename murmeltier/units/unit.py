@@ -70,9 +70,9 @@ class Unit:
         * initialize(init_params = {'beta': {'stddev': 0.5}}, stddev = 1.0) # everything is initialized, beta initializer given distinct arguments
         * initialize(params = {'gamma': 0.5}, init_params = {'delta': {'stddev': 0.5}}, stddev = 1.0) # combination of the above
         '''
-        if params = None:
+        if params is None:
             params = {}
-        if init_params = None:
+        if init_params is None:
             init_params = {}
         self.params.update(params)
         for param_name in init_params:
