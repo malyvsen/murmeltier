@@ -1,4 +1,5 @@
-__all__ = ['stack']
+__all__ = ['memory', 'stack']
 
 
+from .memory import Memory
 from .stack import Stack

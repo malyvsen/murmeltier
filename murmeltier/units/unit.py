@@ -61,7 +61,7 @@ class Unit:
             self.params = trimmed_dict(dict = self.params, keys = param_names)
 
 
-    def initialize(self, params = None, init_params = None, **kwargs):
+    def initialize(self, params = None, init_params = None, initialize_subunits = True, **kwargs):
         '''
         Perform standard operations needed to initialize/reset
         Valid input:
@@ -81,10 +81,10 @@ class Unit:
             if param_name in self.initializers:
                 self.params[param_name] = self.initializers[param_name](**init_params[param_name])
             else:
-                if isinstance(self.params[param_name], Unit):
+                if initialize_subunits and isinstance(self.params[param_name], Unit):
                     self.params[param_name].initialize(**init_params[param_name])
                 else:
-                    raise ValueError('init_params contains key for non-Unit param which does not have initializer - the key is ' + str(param_name))
+                    raise ValueError('init_params contains key for param which cannot be initialized - the key is ' + str(param_name))
         for param_name in self.initializers:
             if param_name in params or param_name in init_params:
                 continue
@@ -92,7 +92,7 @@ class Unit:
         for param_name in self.params:
             if param_name in params or param_name in init_params or param_name in self.initializers:
                 continue
-            if not isinstance(self.params[param_name], Unit):
+            if not initialize_subunits or not isinstance(self.params[param_name], Unit):
                 continue
             self.params[param_name].initialize(**kwargs)
 
