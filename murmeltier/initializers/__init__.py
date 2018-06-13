@@ -8,8 +8,9 @@ Currying is optional, but recommended
 '''
 
 
-__all__ = ['constant', 'normal']
+__all__ = ['constant', 'normal', 'uniform']
 
 
 from .constant import constant
 from .normal import normal
+from .uniform import uniform
