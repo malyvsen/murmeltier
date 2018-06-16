@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def constant(shape = None, low = None, high = None):
+def uniform(shape = None, low = None, high = None):
     '''
     Sample from a uniform probability distribution between min and max
     '''
