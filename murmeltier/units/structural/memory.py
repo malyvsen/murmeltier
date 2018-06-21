@@ -10,7 +10,7 @@ class Memory(Unit):
     A chunk of the same size is then cut from the end of the sub-unit's output and overwrites the old array
     Effectively, implements an RNN
     '''
-    def __init__(self, in_specs = None, out_specs = None, memory_size = None, hidden_unit = None, hidden_unit_type = None, initializer = constant, **kwargs):
+    def __init__(self, in_specs = None, out_specs = None, memory_size = None, hidden_unit = None, hidden_unit_type = None, resetter = constant, **kwargs):
         assert_one(hidden_unit = hidden_unit, hidden_unit_type = hidden_unit_type)
         if hidden_unit_type is not None:
             if in_specs is None:
@@ -39,8 +39,8 @@ class Memory(Unit):
         if out_specs != hidden_unit.out_specs - memory_size:
             raise ValueError('out_specs must be equal to hidden_unit.out_specs - memory_size')
 
-        self.config(in_specs = in_specs, out_specs = out_specs, initializers = {'memory': initializer(shape = memory_size)})
-        self.initialize(params = {'hidden': hidden_unit}, initialize_subunits = False, **kwargs)
+        self.config(in_specs = in_specs, out_specs = out_specs, initializers = {'memory': resetter(shape = memory_size)}, state = {'memory'})
+        self.initialize(params = {'hidden': hidden_unit}, state_only = True, **kwargs)
 
 
     def get_output(self, input):
