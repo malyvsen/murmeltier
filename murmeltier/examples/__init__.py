@@ -1,1 +1,1 @@
-__all__ = ['evo']
+__all__ = ['basic', 'memory']
