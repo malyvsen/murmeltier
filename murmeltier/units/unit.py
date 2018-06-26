@@ -13,7 +13,6 @@ class Unit:
     * out_specs - same for output
     * params - a dictionary of {parameter_name: parameter_value}
     * initializers - a dictionary of {param_name: initializer_function}, does not need to contain all params
-    * state - a set of names of all params that contain state, eg an RNN's memory
     It is a good idea to set up these attributes by calling config(...), possibly followed by initialize(...)
     '''
     def __init__(self, in_specs = None, out_specs = None, **kwargs):
@@ -39,7 +38,6 @@ class Unit:
         * out_specs - overwrite old out_specs if provided
         * param_names - if provided, params and initializers will be trimmed to this list
         * initializers - dictionary of initializers, old ones are updated with those if provided
-        * state - overwrite old state if provided
         '''
         if not hasattr(self, 'params'):
             self.params = {}
@@ -62,14 +60,8 @@ class Unit:
             self.params = trimmed_dict(dict = self.params, keys = param_names)
             self.params = trimmed_dict(dict = self.params, keys = param_names)
 
-        if state is None:
-            if not hasattr(self, 'state'):
-                self.state = set()
-        else:
-            self.state = state
 
-
-    def initialize(self, state_only = False, params = None, init_params = None, initialize_subunits = True, **kwargs):
+    def initialize(self, params = None, init_params = None, explicit_only = False, initialize_subunits = True, **kwargs):
         '''
         Perform standard operations needed to initialize/reset
         Valid input:
@@ -77,8 +69,10 @@ class Unit:
         * initialize(params = {'alpha': 0.5}, stddev = 1.0) # sets params['alpha'] to 0.5, everything else is initialized with stddev = 1.0
         * initialize(init_params = {'beta': {'stddev': 0.5}}, stddev = 1.0) # everything is initialized, beta initializer given distinct arguments
         * initialize(params = {'gamma': 0.5}, init_params = {'delta': {'stddev': 0.5}}, stddev = 1.0) # combination of the above
-        * initialize(state_only = True) # only initialize/reset state, eg. memory in an RNN
+        * initialize(explicit_only = True, params = {'delta': -1.0}, init_params = {'epsilon': {'max': 128}}) # only initialize/reset the explicitly provided params
         '''
+        if explicit_only and bool(kwargs.keys()):
+            raise ValueError('Keyword arguments to initializers provided, but explicit_only is True')
         if params is None:
             params = {}
         if init_params is None:
@@ -87,8 +81,6 @@ class Unit:
         for param_name in init_params:
             if param_name in params:
                 continue
-            if state_only and param_name not in self.state:
-                continue
             if param_name in self.initializers:
                 try:
                     self.params[param_name] = self.initializers[param_name](**init_params[param_name])
@@ -96,25 +88,22 @@ class Unit:
                     pass
                 continue
             if initialize_subunits and param_name in self.params and isinstance(self.params[param_name], Unit):
-                self.params[param_name].initialize(state_only = state_only, **init_params[param_name])
+                self.params[param_name].initialize(explicit_only = explicit_only, **init_params[param_name])
                 continue
-        for param_name in self.initializers:
-            if param_name in params or param_name in init_params:
-                continue
-            if state_only and param_name not in self.state:
-                continue
-            try:
-                self.params[param_name] = self.initializers[param_name](**kwargs)
-            except:
-                pass
+        if not explicit_only:
+            for param_name in self.initializers:
+                if param_name in params or param_name in init_params:
+                    continue
+                try:
+                    self.params[param_name] = self.initializers[param_name](**kwargs)
+                except:
+                    pass
         for param_name in self.params:
             if param_name in params or param_name in init_params or param_name in self.initializers:
                 continue
-            if state_only and param_name not in self.state:
-                continue
             if not initialize_subunits or param_name not in self.params or not isinstance(self.params[param_name], Unit):
                 continue
-            self.params[param_name].initialize(state_only = state_only, **kwargs)
+            self.params[param_name].initialize(params = params, init_params = init_params, explicit_only = explicit_only, initialize_subunits = initialize_subunits, **kwargs)
 
 
     def __add__(self, other):
