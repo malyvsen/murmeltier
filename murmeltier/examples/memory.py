@@ -14,8 +14,8 @@ stack_type = curry(Stack, unit_type = hidden_unit_type, hidden_specs = [8, 6])
 memory_type = curry(Memory, hidden_unit_type = stack_type, memory_size = 4)
 
 
-def agent_randomizer(stddev):
-    return Feedfoward(env = proto_env, hidden_unit_type = memory_type, hidden_specs = [], stddev = stddev, init_params = {'memory': {}})
+def agent_randomizer():
+    return Feedfoward(env = proto_env, hidden_unit_type = memory_type, hidden_specs = [], stddev = 0.125, init_params = {'memory': {}})
 
 
 evo = Evo(env_name = env_name, agent_randomizer = agent_randomizer)
