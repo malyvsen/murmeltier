@@ -23,15 +23,14 @@ class Evo:
                 bubble.agent = self.optimal_agent + self.agent_randomizer()
             for bubble in bubbles:
                 bubble.episode()
-                bubble.agent.initialize(explicit_only = True, init_params = {'memory': {}})
+                bubble.agent.initialize(explicit_only = True, init_params = {'memory': {}}) # re-initialize memory with default initializer params, but keep everything else
 
             rewards = np.array([bubble.reward for bubble in bubbles])
             mean_reward = np.mean(rewards)
             weights = rewards - mean_reward
-            total_weights = np.sum(np.abs(weights))
             update_vector = self.optimal_agent * 0
             for i in range(len(bubbles)):
-                update_vector += (bubbles[i].agent - self.optimal_agent) * weights[i] / total_weights
+                update_vector += (bubbles[i].agent - self.optimal_agent) * weights[i]
             self.optimal_agent += update_vector * learning_rate
 
             if_print(verbosity >= 2, 'Mean reward: ' + str(mean_reward))

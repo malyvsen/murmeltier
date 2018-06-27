@@ -10,8 +10,8 @@ from murmeltier.utils import curry, demo
 env_name = 'Pendulum-v0'
 proto_env = gym.make(env_name)
 hidden_unit_type = curry(Layer, activation_type = LeakyReLU)
-stack_type = curry(Stack, unit_type = hidden_unit_type, hidden_specs = [8, 6])
-memory_type = curry(Memory, hidden_unit_type = stack_type, memory_size = 4)
+stack_type = curry(Stack, unit_type = hidden_unit_type, hidden_specs = [6])
+memory_type = curry(Memory, hidden_unit_type = stack_type, memory_size = 1)
 
 
 def agent_randomizer():
@@ -19,5 +19,5 @@ def agent_randomizer():
 
 
 evo = Evo(env_name = env_name, agent_randomizer = agent_randomizer)
-evo.train()
+evo.train(learning_rate = 1e-4)
 demo(env_name = env_name, agent = evo.optimal_agent)

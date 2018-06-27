@@ -6,7 +6,7 @@ from murmeltier.learning import Evo
 from murmeltier.utils import curry, demo
 
 
-env_name = 'CartPole-v0' # try replacing this with Acrobot-v1
+env_name = 'Acrobot-v1' # try replacing this with Acrobot-v1
 proto_env = gym.make(env_name)
 hidden_unit_type = curry(Layer, activation_type = LeakyReLU)
 hidden_specs = [8, 6]
@@ -17,5 +17,5 @@ def agent_randomizer():
 
 
 evo = Evo(env_name = env_name, agent_randomizer = agent_randomizer)
-evo.train()
+evo.train(learning_rate = 1e-3)
 demo(env_name = env_name, agent = evo.optimal_agent)
