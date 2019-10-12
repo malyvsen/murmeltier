@@ -1,6 +1,8 @@
 # Murmeltier
 German for marmot. Also, a Python framework for AI experiments. Flexible, not necessarily fast - researching differences of kind rather than differences of scale.
 
+**murmeltier is no longer in development, as I have discovered the existence of PyTorch which does exactly the same, but better :)**
+
 ## Installation
 `pip install murmeltier`  
 *...soon enough.*
